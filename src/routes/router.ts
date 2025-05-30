@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTimeToken, login, updateToken, getAllUsers, saveUser, updateUser} from '../controllers/auth.controller.ts';
+import { getTimeToken, login, updateToken, getAllUsers, saveUser, updateUser, deleteUser} from '../controllers/auth.controller.ts';
 
 const routes = express.Router();
 
@@ -14,5 +14,7 @@ routes.get('/find', getAllUsers);
 routes.post('/add', saveUser);
 
 routes.patch('/update', updateUser);
+
+routes.patch('/delete', deleteUser)
 
 export default routes;

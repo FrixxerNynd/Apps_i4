@@ -13,23 +13,28 @@ export const login = async (req: express.Request, res: express.Response) => {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        const user = await User.findOne({ email });
+        // const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(401).json({
-                message: "Usuario Incorrectas" });
+        // if (!user) {
+        //     return res.status(401).json({
+        //         message: "Usuario Incorrectas" });
+        // }
+
+        // //const validPassword = await bcrypt.compare(password, user.password);
+        // if (password !== user.password) {
+        //         return res.status(401).json({ message: "Credenciales Incorrectas" });
+        //     }
+        if (email !=='alice@example.com' || password !== '123456') {
+            return res.status(401).json({ message: "Credenciales Incorrectas" });
         }
 
-        //const validPassword = await bcrypt.compare(password, user.password);
-        if (password !== user.password) {
-                return res.status(401).json({ message: "Credenciales Incorrectas" });
-            }
+        const userId = "123456";
+        //const accessToken = generateAccessToken(user.id);
+        const accessToken = generateAccessToken(userId);
+        cache.set(userId, accessToken, 60 * 15);
 
-            const accessToken = generateAccessToken(user.id);
-            cache.set(user.id, accessToken, 60 * 15);
-
-            return res.json({ accessToken });
-        } catch (error) {
+        return res.json({ accessToken });
+    } catch (error) {
             console.error("Error en login:", error);
             return res.status(501).json({ message: "Error interno del servidor" });
         }
@@ -157,27 +162,27 @@ export const getTimeToken = (req: express.Request, res: express.Response) => {
         }
     };
 
-    export const deleteUser = async (req: Request, res: Response) => {
-        try {
-            const { id } = req.params;
-    
-            const deletedUser = await User.findByIdAndUpdate(
-                id,
-                {
-                    status: false,
-                    deleteDate: new Date()
-                },
-                { new: true }
-            );
-    
-            if (!deletedUser) {
-                return res.status(404).json({ error: 'Usuario no encontrado' });
-            }
-    
-            return res.json({ message: 'Usuario desactivado', deletedUser });
-    
-        } catch (error) {
-            console.log("Error en deleteUser: ", error);
-            return res.status(500).json({ error: 'Error al eliminar usuario' });
+export const deleteUser = async (req: express.Request, res: express.Response) => {
+    try {
+        const { id } = req.params;
+
+        const deletedUser = await User.findByIdAndUpdate(
+            id,
+            {
+                status: false,
+                deleteDate: new Date()
+            },
+            { new: true }
+        );
+
+        if (!deletedUser) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
-    };
+
+        return res.json({ message: 'Usuario desactivado', deletedUser });
+
+    } catch (error) {
+        console.log("Error en deleteUser: ", error);
+        return res.status(500).json({ error: 'Error al eliminar usuario' });
+    }
+};
