@@ -17,4 +17,4 @@ connectBD().then(() => {
 	app.listen(PORT, () => {
 		console.log(`Corriendo el servidor en : http://localhost:${PORT}`);
 	});
-});q
+});
