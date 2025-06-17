@@ -1,9 +1,9 @@
 import express from 'express';
-import { getTimeToken, login, updateToken, getAllUsers, saveUser, updateUser, deleteUser} from '../controllers/auth.controller.ts';
+import { getTimeToken, login, updateToken, getAllUsers, saveUser, updateUser, deleteUser} from '../controllers/auth.controller';
 
 const routes = express.Router();
 
-routes.post('/login', login );
+routes.post('/login-user', login );
 
 routes.get('/time/:userId', getTimeToken);
 
