@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// ✅ Esta interface debe coincidir exactamente con lo que devuelve tu backend
+// ✅ Interface que acepta tanto string como array
 interface User {
   id: string;
   name?: string;
   email: string;
-  roles?: string | string[];
+  roles?: string | string[];  // ← Acepta ambos formatos
 }
 
 interface AuthContextType {
@@ -45,7 +45,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (newToken: string, userData: User, remember: boolean) => {
-    const userDataString = JSON.stringify(userData);
+    // ✅ Normalizar roles a array si viene como string
+    const normalizedUserData = {
+      ...userData,
+      roles: typeof userData.roles === 'string' ? [userData.roles] : userData.roles
+    };
+    
+    const userDataString = JSON.stringify(normalizedUserData);
     
     if (remember) {
       localStorage.setItem('authToken', newToken);
@@ -56,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     setToken(newToken);
-    setUser(userData);
+    setUser(normalizedUserData);
   };
 
   const logout = () => {

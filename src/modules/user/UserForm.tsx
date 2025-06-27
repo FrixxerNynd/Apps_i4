@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-=======
 "use client"
 
 import type React from "react"
 
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,11 +53,7 @@ export default function UserForm() {
       try {
         const res = await fetch("http://192.168.1.126:4000/app/roles")
         const data = await res.json()
-<<<<<<< HEAD
-        setAvailableRoles(data.roles)
-=======
         setAvailableRoles(data)
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
       } catch (err) {
         console.error("Error al obtener roles:", err)
       }
@@ -70,13 +63,6 @@ export default function UserForm() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-<<<<<<< HEAD
-    if (!formData.name.trim()) newErrors.name = "El nombre es requerido"
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "Correo inválido"
-    if (formData.password.length < 6) newErrors.password = "Mínimo 6 caracteres"
-    if (!formData.phone.match(/^[+]?[1-9][\d]{0,15}$/)) newErrors.phone = "Teléfono inválido"
-    if (formData.roles.length === 0) newErrors.roles = "Selecciona al menos un rol"
-=======
 
     // Name validation
     if (!formData.name.trim()) {
@@ -113,7 +99,6 @@ export default function UserForm() {
       newErrors.roles = "Selecciona al menos un rol"
     }
 
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -121,15 +106,11 @@ export default function UserForm() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-<<<<<<< HEAD
-    if (errors[name as keyof FormErrors]) setErrors((prev) => ({ ...prev, [name]: undefined }))
-=======
 
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
   }
 
   const handleRoleChange = (roleId: string, checked: boolean) => {
@@ -137,40 +118,27 @@ export default function UserForm() {
       ...prev,
       roles: checked ? [...prev.roles, roleId] : prev.roles.filter((r) => r !== roleId),
     }))
-<<<<<<< HEAD
-    if (errors.roles) setErrors((prev) => ({ ...prev, roles: undefined }))
-=======
 
     // Clear roles error when user selects a role
     if (errors.roles) {
       setErrors((prev) => ({ ...prev, roles: undefined }))
     }
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-<<<<<<< HEAD
-    if (!validateForm()) return
-    setIsLoading(true)
-=======
 
     if (!validateForm()) return
 
     setIsLoading(true)
     setErrors({})
 
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
     try {
       const res = await fetch("http://192.168.1.126:4000/app/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       })
-<<<<<<< HEAD
-      if (!res.ok) throw new Error("Error al registrar usuario")
-      setIsSuccess(true)
-=======
 
       if (!res.ok) {
         const errorData = await res.json()
@@ -183,40 +151,18 @@ export default function UserForm() {
       setIsSuccess(true)
 
       // Reset form after successful registration
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
       setTimeout(() => {
         setFormData({ name: "", email: "", password: "", phone: "", roles: [] })
         setIsSuccess(false)
       }, 3000)
     } catch (err: any) {
-<<<<<<< HEAD
-      setErrors({ general: err.message })
-=======
       console.error("Error:", err)
       setErrors({ general: err.message || "Error al registrar usuario" })
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
     } finally {
       setIsLoading(false)
     }
   }
 
-<<<<<<< HEAD
-  return isSuccess ? (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardContent className="text-center pt-6">
-          <CheckCircle className="mx-auto text-green-500 h-16 w-16 mb-4" />
-          <h2 className="text-2xl font-bold">Registro Exitoso</h2>
-        </CardContent>
-      </Card>
-    </div>
-  ) : (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-blue-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Registro de Usuario</CardTitle>
-          <CardDescription>Completa todos los campos</CardDescription>
-=======
   const getPasswordStrength = (password: string) => {
     if (password.length === 0) return { strength: 0, label: "" }
     if (password.length < 6) return { strength: 1, label: "Débil" }
@@ -250,7 +196,6 @@ export default function UserForm() {
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Registro de Usuario</CardTitle>
           <CardDescription className="text-center">Completa todos los campos para crear tu cuenta</CardDescription>
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -260,36 +205,6 @@ export default function UserForm() {
                 <AlertDescription>{errors.general}</AlertDescription>
               </Alert>
             )}
-<<<<<<< HEAD
-            <div>
-              <Label htmlFor="name">Nombre</Label>
-              <Input name="name" value={formData.name} onChange={handleInputChange} />
-              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-            </div>
-            <div>
-              <Label htmlFor="email">Correo</Label>
-              <Input name="email" type="email" value={formData.email} onChange={handleInputChange} />
-              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-            </div>
-            <div>
-              <Label htmlFor="password">Contraseña</Label>
-              <Input name="password" type={showPassword ? "text" : "password"} value={formData.password} onChange={handleInputChange} />
-              <Button type="button" variant="ghost" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
-            </div>
-            <div>
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input name="phone" value={formData.phone} onChange={handleInputChange} />
-              {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
-            </div>
-            <div>
-              <Label>Roles</Label>
-              <div className="space-y-2">
-                {availableRoles.map((role) => (
-                  <div key={role._id} className="flex items-center space-x-2">
-=======
 
             <div className="space-y-2">
               <Label htmlFor="name">Nombre completo</Label>
@@ -381,15 +296,11 @@ export default function UserForm() {
               <div className="space-y-3">
                 {availableRoles.map((role) => (
                   <div key={role._id} className="flex items-start space-x-3">
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
                     <Checkbox
                       id={role._id}
                       checked={formData.roles.includes(role._id)}
                       onCheckedChange={(checked) => handleRoleChange(role._id, checked as boolean)}
                     />
-<<<<<<< HEAD
-                    <Label htmlFor={role._id}>{role.type}</Label>
-=======
                     <div className="grid gap-1.5 leading-none">
                       <Label
                         htmlFor={role._id}
@@ -398,16 +309,11 @@ export default function UserForm() {
                         {role.type}
                       </Label>
                     </div>
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
                   </div>
                 ))}
               </div>
               {errors.roles && <p className="text-sm text-red-500">{errors.roles}</p>}
             </div>
-<<<<<<< HEAD
-            <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Crear Cuenta"}
-=======
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
@@ -418,7 +324,6 @@ export default function UserForm() {
               ) : (
                 "Crear Cuenta"
               )}
->>>>>>> 9fb3c1d (Commit Actualizacion frontend)
             </Button>
           </form>
         </CardContent>
