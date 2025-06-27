@@ -3,7 +3,7 @@ import { getTimeToken, login, updateToken, getAllUsers, saveUser, updateUser, de
 
 const routes = express.Router();
 
-routes.post('/login-user', login );
+routes.post('/access', login as express.RequestHandler );
 
 routes.get('/time/:userId', getTimeToken);
 

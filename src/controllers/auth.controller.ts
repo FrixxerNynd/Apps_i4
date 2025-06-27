@@ -13,27 +13,36 @@ export const login = async (req: express.Request, res: express.Response) => {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        // const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
+        console.log("Datos del usuario:", user);
+        if (!user) {
+            return res.status(401).json({ message: "Usuario Incorrectas" });
+        }
 
-        // if (!user) {
-        //     return res.status(401).json({
-        //         message: "Usuario Incorrectas" });
-        // }
-
-        // //const validPassword = await bcrypt.compare(password, user.password);
-        // if (password !== user.password) {
-        //         return res.status(401).json({ message: "Credenciales Incorrectas" });
-        //     }
-        if (email !=='alice@example.com' || password !== '123456') {
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+             return res.status(401).json({ message: "Credenciales Incorrectas" });
+        }
+        
+        /*if (email !=='alice@example.com' || password !== '123456') {
             return res.status(401).json({ message: "Credenciales Incorrectas" });
         }
 
         const userId = "123456";
-        //const accessToken = generateAccessToken(user.id);
-        const accessToken = generateAccessToken(userId);
+        //const accessToken = generateAccessToken(userId);
+        */
+        const userId = user._id.toString(); // MongoDB usa _id
+        const accessToken = generateAccessToken(user.id);
+        // Devolver token Y datos del usuario (sin contraseña)
+        const userData = {
+            id: userId,
+            name: user.name,
+            email: user.email,
+            roles: user.role || []
+        };
         cache.set(userId, accessToken, 60 * 15);
 
-        return res.json({ accessToken });
+        return res.json({ accessToken, user: userData }); //Agregar objeto user
     } catch (error) {
             console.error("Error en login:", error);
             return res.status(501).json({ message: "Error interno del servidor" });
