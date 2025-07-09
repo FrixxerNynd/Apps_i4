@@ -1,11 +1,12 @@
-import { JSX } from 'react';
+import type { JSX } from 'react';
 import OrderData from '../modules/order/OrderData';
 import UserForm from '../modules/user/UserForm';
 import ProductData from '../modules/product/ProductData';
+import UserTable from '../modules/user/UserTable';
 
 export interface AppRoute{
     path: string;
-    element: JSX.Element;
+    element: JSX.Element;   
     label?: string;
     icon?: string;
     //roleIds?: string[];
@@ -21,7 +22,7 @@ const routes: AppRoute[] = [
     },
     {
         path: '/users',
-        element: <UserForm />,
+        element: <UserTable />,
         label: 'Usuarios',
         icon: 'UserOutlined',
     },
@@ -39,10 +40,16 @@ const routes: AppRoute[] = [
     },
     {
         path: '/report',
-        element: <UserForm/>,
+        element: <UserTable/>,
         label: 'Reportes',
         icon: 'UserOutlined',
-    }
+    },
+    // {
+    //     path: '/table',
+    //     element: <UserTable />,
+    //     label: 'Tabla de usuarios',
+    //     icon: 'UserOutlined',
+    // }
 ]
 
 export default routes;
