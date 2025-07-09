@@ -1,6 +1,15 @@
 import { Order } from "../models/Order";
 import { Request, Response } from "express";
 
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = await Order.find({}).sort({ createDate: -1 });
+    return res.json(orders);
+  } catch (err) {
+    return res.status(500).json({ message: 'Error al obtener las órdenes', error: err });
+  }
+};
+
 export const createOrder = async (req: Request, res: Response) => {
   try {
     const { user, subtotal, total } = req.body;

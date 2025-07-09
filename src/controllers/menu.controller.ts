@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { MENU, MenuItem }      from '../models/menu';
+import { Menu } from '../models/IMenu';
+import { MENU, MenuItem} from '../models/menu';
 
 export function getMenuByRole(req: Request, res: Response) {
   // 1) Obtenemos el rol (puede venir en query, body o req.user)
@@ -13,4 +14,19 @@ export function getMenuByRole(req: Request, res: Response) {
 
   // 3) Devolvemos JSON
   return res.json(items);
+}
+
+export function createMenuItem(req: Request, res: Response) {
+  const { name, url, icon, roles } = req.body;
+  if( !name || !url || !icon || !roles ){
+    return res.json({ message: 'Faltan datos' });
+  }
+  const newItem = new Menu({
+    title: name,
+    path: url,
+    icon: icon,
+    roles: roles
+  });
+  newItem.save();
+  return res.json({ message: 'Item creado', menu: newItem });
 }

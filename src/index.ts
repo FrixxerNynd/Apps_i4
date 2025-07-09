@@ -21,7 +21,7 @@ app.use(cors({
 }))
 */
 app.use("/api/auth", authRoutes);
-app.use("/api/v1/order", orderRoutes);
+app.use("/api/order", orderRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/menu", menuRoutes);
 

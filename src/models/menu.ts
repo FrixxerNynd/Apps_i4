@@ -1,4 +1,6 @@
 // src/config/menu.ts
+
+
 export interface MenuItem {
   title: string;
   path:  string;
