@@ -1,46 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Table, Tag } from 'antd';
-import UserModalForm from './UserModalForm';
-import type { ColumnsType } from 'antd/es/table';
+import React, { useEffect, useState } from 'react'
+import { Button, message, Table, Tag } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import GenericModal from '../modal/genericModal'
 
-// Definir el tipo de usuario
 interface UserType {
-  key: string;
-  name: string;
-  email: string;
-  role: string;
-  phone: string;
-  createDate: string;
-  status: boolean;
+  key: string
+  name: string
+  email: string
+  role: string
+  phone: string
+  createDate: string
+  status: boolean
+  password?: string // opcional, para edición
 }
 
+const userFieldsSchema = [
+  { key: 'name', label: 'Nombre', type: 'string', required: true },
+  { key: 'email', label: 'Correo electrónico', type: 'string', required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+  { key: 'password', label: 'Contraseña', type: 'password', required: false },
+  { key: 'role', label: 'Rol', type: 'select', required: true, options: [
+    { label: 'Admin', value: 'admin' },
+    { label: 'User', value: 'user' },
+  ] },
+  { key: 'phone', label: 'Teléfono', type: 'string', required: true, pattern: /^[+]?[0-9\s\-]{7,15}$/ },
+]
+
 const UserTable: React.FC = () => {
-  const [data, setData] = useState<UserType[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [visible, setVisible] = useState<boolean>(false);
-  const [user, setUser] = useState<any>(null);
+  const [data, setData] = useState<UserType[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<Partial<UserType> | null>(null)
 
-
-  const handleEdit = (user: any) => {
-    console.log('Editar usuario:', user);
-    setVisible(true);
-    setUser(user);
-  };
-
-  const closeModal = () => { setVisible(false); };
-
-  const saveData = (user: any) => {
-    console.log('Guardando usuario:', user);
-    // Aquí deberías hacer la llamada a la API para actualizar el usuario
-    closeModal();
-  };
-
-  // Función para obtener usuarios desde la API
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/find');
-      const json = await response.json();
-      const users = json.userList;
+      const response = await fetch('http://localhost:3000/api/auth/find')
+      const json = await response.json()
+      const users = json.userList
 
       const formatted = users.map((user: any) => ({
         key: user._id,
@@ -50,29 +45,69 @@ const UserTable: React.FC = () => {
         phone: user.phone,
         createDate: user.createDate,
         status: user.status,
-      }));
-
-      setData(formatted);
+      }))
+      setData(formatted)
     } catch (error) {
-      console.error('Error al obtener los usuarios:', error);
+      console.error('Error al obtener los usuarios:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers()
+  }, [])
 
-  // Generar filtros únicos por nombre (evita duplicados)
-  const nameFilters = Array.from(
-    new Set(data.map((user) => user.name))
-  ).map((name) => ({
+  const openModalForEdit = (user: UserType) => {
+    setSelectedUser(user)
+    setModalVisible(true)
+  }
+
+  const openModalForNew = () => {
+    setSelectedUser({ name: '', email: '', password: '', role: '', phone: '' })
+    setModalVisible(true)
+  }
+
+  const closeModal = () => {
+    setModalVisible(false)
+    setSelectedUser(null)
+  }
+
+  const handleSave = async (userData: any) => {
+    try {
+      const payload = { ...userData }
+      if (selectedUser?.key) {
+        // Para edición, envía PUT a la API con ID
+        const response = await fetch(`http://localhost:3000/api/auth/update/${selectedUser.key}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!response.ok) throw new Error('Error al actualizar usuario')
+        message.success('Usuario actualizado correctamente')
+      } else {
+        // Para nuevo usuario, POST
+        const response = await fetch('http://localhost:3000/api/auth/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!response.ok) throw new Error('Error al crear usuario')
+        message.success('Usuario creado correctamente')
+      }
+      closeModal()
+      fetchUsers()
+    } catch (error) {
+      console.error('Error en handleSave:', error)
+      message.error('Error al guardar usuario')
+    }
+  }
+
+  const nameFilters = Array.from(new Set(data.map((user) => user.name))).map((name) => ({
     text: name,
     value: name,
-  }));
+  }))
 
-  // Definir columnas de la tabla con filtro por nombre
   const columns: ColumnsType<UserType> = [
     {
       title: 'Nombre',
@@ -111,28 +146,34 @@ const UserTable: React.FC = () => {
         status ? <Tag color="green">Activo</Tag> : <Tag color="red">Inactivo</Tag>,
     },
     {
-        title: 'Acciones',
-        key: 'actions',
-        render: (_, record) => (
-                <Button type="primary" onClick={() => handleEdit(record)}>
-                    Editar
-                </Button>
-        ),
+      title: 'Acciones',
+      key: 'actions',
+      render: (_, record) => (
+        <Button type="primary" onClick={() => openModalForEdit(record)}>
+          Editar
+        </Button>
+      ),
     },
-  ];
+  ]
 
   return (
     <>
+      <Button type="primary" onClick={openModalForNew} style={{ marginBottom: 16 }}>
+        Nuevo Usuario
+      </Button>
       <Table<UserType> columns={columns} dataSource={data} loading={loading} />
-      <UserModalForm
-        visible={visible}
-        message={user ? 'Editar Usuario' : 'Nuevo Usuario'}
-        onClose={closeModal}
-        onSave={saveData}
-        user={user}
-      />
+      {selectedUser && (
+        <GenericModal
+          visible={modalVisible}
+          title={selectedUser.key ? 'Editar Usuario' : 'Nuevo Usuario'}
+          data={selectedUser}
+          fieldsSchema={userFieldsSchema}
+          onClose={closeModal}
+          onSubmit={handleSave}
+        />
+      )}
     </>
-  );
-};
+  )
+}
 
-export default UserTable;
+export default UserTable

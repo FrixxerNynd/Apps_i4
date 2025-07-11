@@ -25,7 +25,6 @@ const OrderTable: React.FC = () => {
     setModalVisible(true)
   }
 
-  
   const fetchOrders = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/order/orders")
@@ -54,18 +53,34 @@ const OrderTable: React.FC = () => {
 
   const handleUpdate = async (updatedData: Record<string, any>) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/product/${updatedData.key}`, {
+      const response = await fetch(`http://localhost:3000/api/order/${updatedData.key}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       })
 
-      if (!response.ok) throw new Error("Error al actualizar el producto")
+      if (!response.ok) throw new Error("Error al actualizar la orden")
 
-      message.success("Producto actualizado correctamente")
+      message.success("Orden actualizada correctamente")
       fetchOrders()
     } catch (error) {
-      message.error("No se pudo actualizar el producto")
+      message.error("No se pudo actualizar la orden")
+    }
+  }
+
+  const handleCreate = async (newData: Record<string, any>) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/order/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newData),
+      })
+      if (!response.ok) throw new Error("Error al crear la orden")
+      message.success("Orden creada correctamente")
+      fetchOrders()
+      setModalVisible(false)
+    } catch (error) {
+      message.error("No se pudo crear la orden")
     }
   }
 
@@ -112,21 +127,25 @@ const OrderTable: React.FC = () => {
     },
   ]
 
-  return (
+  
+  
+    return (
     <>
+      <Button type="primary" onClick={() => openModal(null)} style={{ marginBottom: 16 }}>
+        Nueva Orden
+      </Button>
       <Table<OrderType> columns={columns} dataSource={data} loading={loading} />
-      {selectedItem && (
+      {modalVisible && (
         <GenericModal
           visible={modalVisible}
-          data={selectedItem}
-          title="Editar Orden"
+          data={selectedItem || { user: "", subtotal: 0, total: 0 }}
+          title={selectedItem ? "Editar Orden" : "Nueva Orden"}
           readOnly={false}
           onClose={() => setModalVisible(false)}
-          onSubmit={handleUpdate}
+          onSubmit={selectedItem ? handleUpdate : handleCreate}
         />
       )}
     </>
-  )
-}
+  )};
 
 export default OrderTable

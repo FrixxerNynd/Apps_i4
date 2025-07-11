@@ -131,21 +131,60 @@ const ProductTable: React.FC = () => {
   ]
 
 
+  const [/*createModalVisible*/, setCreateModalVisible] = useState(true)
+
+  const handleCreate = async (newData: Record<string, any>) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/product/product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newData),
+      })
+
+      if (!response.ok) throw new Error("Error al crear el producto")
+
+      message.success("Producto creado correctamente")
+      setCreateModalVisible(false)
+      fetchProducts()
+    } catch (error) {
+      message.error("No se pudo crear el producto")
+    }
+  }
+
+
   return (
     <>
-      <Table<ProductType> columns={columns} dataSource={data} loading={loading} />
-      {selectedItem && (
+      <Button
+        type="primary"
+        onClick={() => openModal(null)}
+        style={{ marginBottom: 16 }}
+      >
+        Nuevo Producto
+      </Button>
+      <Table<ProductType>
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+      />
+      {modalVisible && (
         <GenericModal
           visible={modalVisible}
-          data={selectedItem}
-          title="Editar Producto"
+          data={
+            selectedItem || {
+              name: "",
+              description: "",
+              quantity: 0,
+              price: 0,
+            }
+          }
+          title={selectedItem ? "Editar Producto" : "Nuevo Producto"}
           readOnly={false}
           onClose={() => setModalVisible(false)}
-          onSubmit={handleUpdate}
+          onSubmit={selectedItem ? handleUpdate : handleCreate}
         />
       )}
     </>
-  )
+  );
 }
 
 export default ProductTable
