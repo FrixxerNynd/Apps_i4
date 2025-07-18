@@ -143,6 +143,7 @@ const OrderTable: React.FC = () => {
           readOnly={false}
           onClose={() => setModalVisible(false)}
           onSubmit={selectedItem ? handleUpdate : handleCreate}
+          type="orders"
         />
       )}
     </>

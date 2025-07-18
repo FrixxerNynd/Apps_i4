@@ -11,13 +11,48 @@ import {
 import dayjs from "dayjs"
 
 interface GenericModalProps {
-  visible: boolean
-  data: Record<string, any>
-  title?: string
-  onClose: () => void
+  visible: boolean;
+  data: Record<string, any>;
+  title?: string;
+  onClose: () => void;
   onSubmit?: (updatedData: Record<string, any>) => void
-  readOnly?: boolean
+  readOnly?: boolean;
+  type: 'user' | 'orders' | 'products'; 
+
 }
+
+const validationRules: Record<string, Record<string, any[]>> = {
+  user: {
+    name: [{ required: true, message: 'El nombre es obligatorio' }],
+    email: [
+      { required: true, message: 'El correo es obligatorio' },
+      { type: 'email', message: 'Debe ser un correo válido' },
+    ],
+    password: [{ required: true, message: 'La contraseña es obligatoria' }],
+    role: [{ required: true, message: 'El rol es obligatorio' }],
+    phone: [
+      { required: true, message: 'El teléfono es obligatorio' },
+      { pattern: /^\d+$/, message: 'Solo se permiten números' },
+    ],
+  },
+  orders: {
+    productId: [{ required: true, message: 'ID de producto requerido' }],
+    quantity: [
+      { required: true, message: 'Cantidad obligatoria' },
+      { type: 'number', min: 1, message: 'Debe ser al menos 1' },
+    ],
+    orderDate: [{ required: true, message: 'Fecha requerida' }],
+  },
+  products: {
+    name: [{ required: true, message: 'Nombre del producto requerido' }],
+    price: [
+      { required: true, message: 'Precio requerido' },
+      { type: 'number', min: 0, message: 'Debe ser mayor o igual a 0' },
+    ],
+    status: [{ required: true, message: 'Estado requerido' }],
+  },
+};
+
 
 const GenericModal: React.FC<GenericModalProps> = ({
   visible,
@@ -26,6 +61,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
   onClose,
   onSubmit,
   readOnly = false,
+  type,
 }) => {
   const [form] = Form.useForm()
 
@@ -87,6 +123,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
             label={key}
             name={key}
             valuePropName={typeof value === "boolean" ? "checked" : "value"}
+            rules={validationRules[type]?.[key] || []}
           >
             {renderInput(key, value)}
           </Form.Item>

@@ -167,9 +167,9 @@ const UserTable: React.FC = () => {
           visible={modalVisible}
           title={selectedUser.key ? 'Editar Usuario' : 'Nuevo Usuario'}
           data={selectedUser}
-          fieldsSchema={userFieldsSchema}
           onClose={closeModal}
           onSubmit={handleSave}
+          type="user"
         />
       )}
     </>

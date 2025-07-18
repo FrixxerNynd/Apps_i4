@@ -181,6 +181,7 @@ const ProductTable: React.FC = () => {
           readOnly={false}
           onClose={() => setModalVisible(false)}
           onSubmit={selectedItem ? handleUpdate : handleCreate}
+          type="products"
         />
       )}
     </>
